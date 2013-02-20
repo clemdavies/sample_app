@@ -48,7 +48,7 @@ describe "Static pages" do
   end
 
 
-  describe "About page" do
+  describe "Contact page" do
 
     it "should have the h1 'Contact Us'" do
       visit '/static_pages/contact'

@@ -10,6 +10,7 @@ group :development, :test do
   #gem 'guard-spork', '1.2.0'
   gem 'guard-spork', :github => 'guard/guard-spork'
   gem 'spork', '0.9.2'
+  gem 'annotate', '2.5.0'
 end
 
 # Gems used only for assets and not required

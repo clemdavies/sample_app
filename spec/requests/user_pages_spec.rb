@@ -4,12 +4,26 @@ describe "UserPages" do
 
   subject { page }
 
+  let(:have_blank_password_error) { have_specific_error_message "Password can't be blank" }
+  let(:have_blank_name_error) { have_specific_error_message "Name can't be blank" }
+  let(:have_blank_email_error) { have_specific_error_message "Email can't be blank" }
+  let(:have_invalid_email_error) { have_specific_error_message "Email is invalid" }
+  let(:have_short_password_error) { have_specific_error_message "Password is too short" }
+  let(:have_blank_confirmation_error) { have_specific_error_message "Password confirmation can't be blank" }
+  let(:have_mismatch_password_error) { have_specific_error_message "Password doesn't match confirmation" }
+
+  shared_examples_for "all invalid signups" do
+    it "should not create a user" do
+      expect { click_button submit }.not_to change(User, :count)
+    end
+  end#shared invalid
+
   describe "signup page" do
     before { visit signup_path }
 
     it { should have_selector('h1', text:'Sign up') }
     it { should have_selector('title', text:full_title('Sign up')) }
-  end
+  end#signup
 
   describe "profile page" do
     let(:user) { FactoryGirl.create(:user) }
@@ -17,193 +31,94 @@ describe "UserPages" do
 
     it { should have_selector('h1',    text: user.name) }
     it { should have_selector('title', text: user.name) }
-  end
+  end#profile
 
   describe "signup" do
     before { visit signup_path}
     let(:submit) { "Create my account"}
 
-    describe "with invalid information" do
-      it "should not create a user" do
-        expect { click_button submit }.not_to change(User, :count)
-      end
-
+    describe "with empty form submission" do
+      it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
-        it { should have_selector('title', text:'Sign up') }
-        it { should have_content('error') }
-      end #after submission
+        it { should have_error_message '6' }
+        it { should have_blank_password_error }
+        it { should have_blank_name_error }
+        it { should have_blank_email_error }
+        it { should have_invalid_email_error }
+        it { should have_short_password_error }
+        it { should have_blank_confirmation_error }
+      end#after submission
+    end#with empty form
 
-    end #with invalid general
-
-    describe "with invalid information" do
-      it "should not create a user" do
-        expect { click_button submit }.not_to change(User, :count)
-      end
-
+    describe "with blank name submission" do
+      before { blank_name_signup }
+      it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
-        it { should have_selector('title', text:'Sign up') }
-        it { should have_content('error') }
-        let(:error_count) { page.find 'div.alert-error' }
-        it { error_count.should have_content "6" }
-        let(:error_messages) { page.find 'div#error_explanation ul' }
-        it { error_messages.should have_content "Password can't be blank" }
-        it { error_messages.should have_content "Name can't be blank" }
-        it { error_messages.should have_content "Email can't be blank" }
-        it { error_messages.should have_content "Email is invalid" }
-        it { error_messages.should have_content "Password is too short" }
-        it { error_messages.should have_content "Password confirmation can't be blank" }
-      end #after submission
+        it { should have_error_message '1'}
+        it { should have_blank_name_error }
+      end#after submission
+    end#with no name
 
-    end #with invalid specific all errors
-
-    describe "with invalid information" do
-      before do
-        #fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: "user@example.com"
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
-      end
-
-      it "should not create a user" do
-        expect { click_button submit }.not_to change(User, :count)
-      end
-
+    describe "with blank email submission" do
+      before { blank_email_signup}
+      it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
-        it { should have_selector('title', text:'Sign up') }
-        it { should have_content('error') }
-        let(:error_count) { page.find 'div.alert-error' }
-        it { error_count.should have_content "1" }
-        let(:error_messages) { page.find 'div#error_explanation ul' }
-        it { error_messages.should have_content "Name can't be blank" }
-      end #after submission
+        it { should have_error_message "2" }
+        it { should have_blank_email_error }
+        it { should have_invalid_email_error }
+      end#after submission
+    end#with no email
 
-    end #with invalid specific no name
-
-    describe "with invalid information" do
-      before do
-        fill_in "Name",         with: "Example User"
-        #fill_in "Email",        with: "user@example.com"
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
-      end
-
-      it "should not create a user" do
-        expect { click_button submit }.not_to change(User, :count)
-      end
-
+    describe "with blank passwords submission" do
+      before { blank_passwords_signup }
+      it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
-        it { should have_selector('title', text:'Sign up') }
-        it { should have_content('error') }
-        let(:error_count) { page.find 'div.alert-error' }
-        it { error_count.should have_content "2" }
-        let(:error_messages) { page.find 'div#error_explanation ul' }
-        it { error_messages.should have_content "Email can't be blank" }
-        it { error_messages.should have_content "Email is invalid" }
-      end #after submission
+        it { should have_error_message "3" }
+        it { should have_blank_password_error }
+        it { should have_short_password_error }
+        it { should have_blank_confirmation_error }
+      end#after submission
+    end#with no password
 
-    end #with invalid specific no email
-
-    describe "with invalid information" do
-      before do
-        fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: "user@example.com"
-        #fill_in "Password",     with: "foobar"
-        #fill_in "Confirmation", with: "foobar"
-      end
-
-      it "should not create a user" do
-        expect { click_button submit }.not_to change(User, :count)
-      end
-
+    describe "with mismatched passwords submission" do
+      before { password_mismatch_signup }
+      it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
-        it { should have_selector('title', text:'Sign up') }
-        it { should have_content('error') }
-        let(:error_count) { page.find 'div.alert-error' }
-        it { error_count.should have_content "3" }
-        let(:error_messages) { page.find 'div#error_explanation ul' }
-        it { error_messages.should have_content "Password can't be blank" }
-        it { error_messages.should have_content "Password is too short" }
-        it { error_messages.should have_content "Password confirmation can't be blank" }
-      end #after submission
+        it { should have_error_message "1" }
+        it { should have_mismatch_password_error }
+      end#after submission
+    end#with password doesn't match
 
-    end #with invalid specific no password
-
-    describe "with invalid information" do
-      before do
-        fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: "user@example.com"
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "raboof"
-      end
-
-      it "should not create a user" do
-        expect { click_button submit }.not_to change(User, :count)
-      end
-
+    describe "with too short password submission" do
+      before { short_password_signup }
+      it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
-        it { should have_selector('title', text:'Sign up') }
-        it { should have_content('error') }
-        let(:error_count) { page.find 'div.alert-error' }
-        it { error_count.should have_content "1" }
-        let(:error_messages) { page.find 'div#error_explanation ul' }
-        it { error_messages.should have_content "Password doesn't match confirmation" }
-      end #after submission
-
-    end #with invalid specific password doesn't match
-
-    describe "with invalid information" do
-      before do
-        fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: "user@example.com"
-        fill_in "Password",     with: "foo"
-        fill_in "Confirmation", with: "foo"
-      end
-
-      it "should not create a user" do
-        expect { click_button submit }.not_to change(User, :count)
-      end
-
-      describe "after submission" do
-        before { click_button submit }
-        it { should have_selector('title', text:'Sign up') }
-        it { should have_content('error') }
-        let(:error_count) { page.find 'div.alert-error' }
-        it { error_count.should have_content "1" }
-        let(:error_messages) { page.find 'div#error_explanation ul' }
-        it { error_messages.should have_content "Password is too short" }
-      end #after submission
-
-    end #with invalid specific password too short
+        it { should have_error_message "1" }
+        it { should have_short_password_error }
+      end#after submission
+    end#with password too short
 
 
-    describe "with valid information" do
-      before do
-        fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: "user@example.com"
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
-      end
-
+    describe "with valid information submission" do
+      before { valid_signup }
       it "should create a user" do
         expect { click_button submit }.to change(User, :count).by(1)
       end
-
       describe "after saving the user" do
         before { click_button submit }
         let(:user) { User.find_by_email('user@example.com') }
         it { should have_selector('title',text: user.name) }
         it { should have_selector('div.alert.alert-success', text:'Welcome') }
         it { should have_link('Sign out') }
-      end #after saving
+      end#after saving
+    end#with valid
 
-    end #with valid
+  end#signup
 
-  end #signup
-
-end #UserPages
+end#UserPages

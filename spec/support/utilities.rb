@@ -1,20 +1,22 @@
 include ApplicationHelper
 
-def valid_signin(user)
+def valid_signin(user_in)
   visit signin_path
-  fill_in "Email",    with: user.email
-  fill_in "Password", with: user.password
+  fill_in "Email",    with: user_in.email
+  fill_in "Password", with: user_in.password
   click_button "Sign in"
   # Sign in when not using Capybara as well.
-  cookies[:remember_token] = user.remember_token
+  cookies[:remember_token] = user_in.remember_token
 end
 
 def fill_form(user_in)
+
                              # if (object has key){ user_in[:name] }else{ 'Example User' }
   fill_in "Name",         with: user_in.key?(:name) ? user_in[:name] : 'Example User'
   fill_in "Email",        with: user_in.key?(:email) ? user_in[:email] : 'user@example.com'
   fill_in "Password",     with: user_in.key?(:password) ? user_in[:password] : 'foobar'
   fill_in "Confirmation", with: user_in.key?(:confirmation) ? user_in[:confirmation] : 'foobar'
+
 end
 
 

@@ -4,15 +4,13 @@ describe "AuthenticationPages" do
 
   subject { page }
 
-  describe "signin page" do
-    before { visit signin_path }
-
-    it { should have_selector('h1',    text: 'Sign in') }
-    it { should have_selector('title', text: 'Sign in') }
-  end#signin page
 
   describe "signin" do
     before { visit signin_path }
+    describe "page" do
+      it { should have_selector('h1',    text: 'Sign in') }
+      it { should have_selector('title', text: 'Sign in') }
+    end#page
 
     describe "with invalid information" do
       before { click_button "Sign in" }
@@ -100,20 +98,71 @@ describe "AuthenticationPages" do
           it "should render the desired protected page" do
             page.should have_selector('title', text: 'Edit user')
           end
-        end
-      end
+
+          describe "when signing in again" do
+            before do
+              click_link 'Sign out'
+              valid_signin user
+            end
+
+            it "should render the default (profile) page" do
+              page.should have_selector('title', text: user.name)
+            end
+          end#signing in again
+
+        end#after signing in
+      end#attempt visit protected
 
 
 
     end#non-signed-in
+
+    describe "for signed in users" do
+      let(:user) { FactoryGirl.create(:user) }
+
+      describe "attempting to visit" do
+
+        describe"sign in page" do
+         before do
+           valid_signin user
+           get signin_path
+         end
+         specify { should redirect_to(root_path) }
+        end
+        describe"sign up page" do
+         before do
+           valid_signin user
+           get signup_path
+         end
+         specify { should redirect_to(root_path) }
+        end
+
+      end#attempting visit
+
+      describe "when attempting to post to sign up page" do
+        before do
+          valid_signin user
+          post signup_path
+        end
+         specify { should redirect_to(root_path) }
+      end#attempt post sign up
+
+      describe "when attempting to destroy session" do
+        before do
+          valid_signin user
+          delete signout_path
+        end
+         specify { should redirect_to(root_path) }
+      end#attempt destroy session
+
+    end#signed in users
+
 
 
     describe "as wrong user" do
       let(:user) { FactoryGirl.create(:user) }
       let(:wrong_user) { FactoryGirl.create(:user, email: "wrong@example.com") }
       before { valid_signin user }
-
-
 
       describe "visiting Users#edit page" do
         before { visit edit_user_path(wrong_user) }

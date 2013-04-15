@@ -28,6 +28,7 @@ describe "UserPages" do
   end#profile
 
   describe "signup" do
+
     before { visit signup_path }
 
     describe "page" do
@@ -207,12 +208,6 @@ describe "UserPages" do
       end#after submission
     end#with short passwords
 
-
-
-
-
-
-
     describe "with valid information" do
       let(:new_name)  { "New Name" }
       let(:new_email) { "new@example.com" }
@@ -221,7 +216,7 @@ describe "UserPages" do
         fill_in "Email",            with: new_email
         fill_in "Password",         with: user.password
         fill_in "Confirmation",     with: user.password
-        click_button "Save changes"
+        click_button submit
       end
 
       it { should have_selector('title', text: new_name) }
@@ -232,8 +227,8 @@ describe "UserPages" do
     end#valid
   end#edit
 
-   describe "index" do
 
+  describe "index" do
 
     let(:user) { FactoryGirl.create(:user) }
 
@@ -260,21 +255,32 @@ describe "UserPages" do
 
     describe "delete links" do
 
-      it { should_not have_link('delete') }
+      describe "as normal user" do
+        it { should have_selector('title', text: 'All users') }
+        it { should have_selector('h1',    text: 'All users') }
+        it { should_not have_link('delete') }
+      end
 
-      describe "as an admin user" do
-        let(:admin) { FactoryGirl.create(:admin) }
+      describe "as admin user" do
+
+        let (:admin) { FactoryGirl.create(:admin) }
         before do
-          valid_signin admin
+          click_link 'Sign out'
+          valid_signin ( admin )
           visit users_path
         end
-
         it { should have_link('delete', href: user_path(User.first)) }
         it "should be able to delete another user" do
           expect { click_link('delete') }.to change(User, :count).by(-1)
         end
+
+        it "should not be able to delete admin" do
+          expect { delete user_path(admin) }.to_not change(User, :count).by(-1)
+        end
+
         it { should_not have_link('delete', href: user_path(admin)) }
-      end
+      end#admin user
+
     end#delete
 
   end#index

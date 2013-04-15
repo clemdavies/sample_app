@@ -18,13 +18,6 @@ describe "UserPages" do
     end
   end#shared invalid
 
-  describe "signup page" do
-    before { visit signup_path }
-
-    it { should have_selector('h1', text:'Sign up') }
-    it { should have_selector('title', text:full_title('Sign up')) }
-  end#signup
-
   describe "profile page" do
     let(:user) { FactoryGirl.create(:user) }
     before { visit user_path(user) }
@@ -34,7 +27,13 @@ describe "UserPages" do
   end#profile
 
   describe "signup" do
-    before { visit signup_path}
+    before { visit signup_path }
+
+    describe "page" do
+      it { should have_selector('h1', text:'Sign up') }
+      it { should have_selector('title', text:full_title('Sign up')) }
+    end#page
+
     let(:submit) { "Create my account"}
 
     describe "with empty form submission" do
@@ -52,7 +51,7 @@ describe "UserPages" do
     end#with empty form
 
     describe "with blank name submission" do
-      before { blank_name_signup }
+      before { blank_name }
       it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
@@ -62,7 +61,7 @@ describe "UserPages" do
     end#with no name
 
     describe "with blank email submission" do
-      before { blank_email_signup}
+      before { blank_email }
       it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
@@ -73,7 +72,7 @@ describe "UserPages" do
     end#with no email
 
     describe "with blank passwords submission" do
-      before { blank_passwords_signup }
+      before { blank_passwords }
       it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
@@ -85,7 +84,7 @@ describe "UserPages" do
     end#with no password
 
     describe "with mismatched passwords submission" do
-      before { password_mismatch_signup }
+      before { password_mismatch }
       it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
@@ -95,7 +94,7 @@ describe "UserPages" do
     end#with password doesn't match
 
     describe "with too short password submission" do
-      before { short_password_signup }
+      before { short_password }
       it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
@@ -106,7 +105,7 @@ describe "UserPages" do
 
 
     describe "with valid information submission" do
-      before { valid_signup }
+      before { valid }
       it "should create a user" do
         expect { click_button submit }.to change(User, :count).by(1)
       end
@@ -134,10 +133,75 @@ describe "UserPages" do
       it { should have_link('change', href: 'http://gravatar.com/emails') }
     end#page
 
-    describe "with invalid information" do
-      before { click_button "Save changes" }
-      it { should have_content('error') }
-    end#invalid
+
+
+    let(:submit) { "Save changes"}
+
+    describe "with empty form" do
+      before { blank_all }
+      describe "after submission" do
+        before { click_button submit }
+        it { should have_error_message '5' }
+        it { should have_blank_name_error }
+        it { should have_blank_email_error }
+        it { should have_invalid_email_error }
+        it { should have_short_password_error }
+        it { should have_blank_confirmation_error }
+      end#after submission
+    end#with empty form
+
+    describe "with blank name" do
+      before { blank_name }
+      describe "after submission" do
+        before { click_button submit }
+        it { should have_error_message '1'}
+        it { should have_blank_name_error }
+      end#after submission
+    end#with no name
+
+    describe "with blank email" do
+      before { blank_email }
+      describe "after submission" do
+        before { click_button submit }
+        it { should have_error_message '2' }
+        it { should have_blank_email_error }
+        it { should have_invalid_email_error }
+      end#after submission
+    end#with no email
+
+    describe "with blank passwords" do
+      before { blank_passwords }
+      describe "after submission" do
+        before { click_button submit }
+        it { should have_error_message '2' }
+        it { should have_short_password_error }
+        it { should have_blank_confirmation_error }
+      end#after submission
+    end#with no password
+
+    describe "with mismatched passwords" do
+      before { password_mismatch }
+      describe "after submission" do
+        before { click_button submit }
+        it { should have_error_message '1' }
+        it { should have_mismatch_password_error }
+      end#after submission
+    end#with password doesn't match
+
+    describe "with short passwords" do
+      before { short_password }
+      describe "after submission" do
+        before { click_button submit }
+        it { should have_error_message '1' }
+        it { should have_short_password_error }
+      end#after submission
+    end#with short passwords
+
+
+
+
+
+
 
     describe "with valid information" do
       let(:new_name)  { "New Name" }
@@ -146,7 +210,7 @@ describe "UserPages" do
         fill_in "Name",             with: new_name
         fill_in "Email",            with: new_email
         fill_in "Password",         with: user.password
-        fill_in "Confirm Password", with: user.password
+        fill_in "Confirmation",     with: user.password
         click_button "Save changes"
       end
 

@@ -35,9 +35,24 @@ describe User do
       @user.save!
       @user.toggle!(:admin)
     end
-
     it { should be_admin }
   end
+
+  describe "accessible attributes" do
+    it "should not allow access to admin" do
+      expect do
+        User.new(admin: true)
+      end.to raise_error(ActiveModel::MassAssignmentSecurity::Error)
+      expect do
+        User.new(admin: nil)
+      end.to raise_error(ActiveModel::MassAssignmentSecurity::Error)
+      expect do
+        User.new(admin: 'a')
+      end.to raise_error(ActiveModel::MassAssignmentSecurity::Error)
+    end
+  end
+
+
 
 
 

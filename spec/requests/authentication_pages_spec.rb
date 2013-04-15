@@ -34,7 +34,6 @@ describe "AuthenticationPages" do
       it { should have_selector('title', text: user.name) }
       it { should have_link('Profile', href: user_path(user)) }
 
-
       it { should have_link('Users',    href: users_path) }
       it { should have_link('Settings', href: edit_user_path(user)) }
 
@@ -55,6 +54,18 @@ describe "AuthenticationPages" do
 
     describe "for non-signed-in users" do
       let(:user) { FactoryGirl.create(:user) }
+
+      describe "the header links" do
+        before { visit root_path }
+        it { should have_link('Home') }
+        it { should have_link('Help') }
+        it { should have_link('Sign in') }
+        it { should_not have_link('Settings') }
+        it { should_not have_link('Profile') }
+        it { should_not have_link('Sign out') }
+        it { should_not have_link('Users') }
+      end
+
 
       describe "in the Users controller" do
 

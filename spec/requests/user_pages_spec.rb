@@ -6,6 +6,7 @@ describe "UserPages" do
 
   let(:have_blank_password_error) { have_specific_error_message "Password can't be blank" }
   let(:have_blank_name_error) { have_specific_error_message "Name can't be blank" }
+  let(:have_long_name_error) { have_specific_error_message "Name is too long" }
   let(:have_blank_email_error) { have_specific_error_message "Email can't be blank" }
   let(:have_invalid_email_error) { have_specific_error_message "Email is invalid" }
   let(:have_short_password_error) { have_specific_error_message "Password is too short" }
@@ -158,6 +159,15 @@ describe "UserPages" do
         it { should have_blank_name_error }
       end#after submission
     end#with no name
+
+    describe "with long name" do
+      before { long_name }
+      describe "after submission" do
+        before { click_button submit }
+        it { should have_error_message '1'}
+        it { should have_long_name_error }
+      end#after submission
+    end#with long name
 
     describe "with blank email" do
       before { blank_email }

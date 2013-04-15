@@ -30,6 +30,10 @@ def blank_name
   fill_form ( { name: nil } )
 end
 
+def long_name
+  fill_form ( { name: 'a'*51 } )
+end
+
 def blank_email
   fill_form ( { email: nil } )
 end
@@ -39,11 +43,11 @@ def blank_passwords
 end
 
 def password_mismatch
-  fill_form ( { password: "foobar", confirmation: "raboof" } )
+  fill_form ( { password: 'a'*6, confirmation: 'b'*6 } )
 end
 
 def short_password
-  fill_form ( { password: "foo", confirmation: "foo" } )
+  fill_form ( { password: 'a'*3, confirmation: 'a'*3 } )
 end
 
 

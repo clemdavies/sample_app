@@ -1,10 +1,10 @@
 class UsersController < ApplicationController
 
 
-  before_filter :signed_in_user,    only: [:index, :edit, :update, :destroy]
-  before_filter :already_signed_in, only: [:new, :create]
-  before_filter :correct_user,      only: [:edit, :update]
-  before_filter :admin_user,        only: :destroy
+  before_filter :signed_in_user,     only: [:index, :edit, :update, :destroy]
+  before_filter :not_signed_in_user, only: [:new, :create]
+  before_filter :correct_user,       only: [:edit, :update]
+  before_filter :admin_user,         only: :destroy
 
 
   def index
@@ -61,8 +61,8 @@ class UsersController < ApplicationController
          redirect_to signin_url, notice: "Please sign in."
        end
     end
-    def already_signed_in
-      unless !signed_in?
+    def not_signed_in_user
+      if signed_in?
         redirect_to root_path
       end
     end

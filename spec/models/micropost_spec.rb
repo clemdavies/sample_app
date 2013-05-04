@@ -27,5 +27,15 @@ describe Micropost do
     it { should_not be_valid }
   end#user_id not present
 
+  describe "with blank content" do
+    before { @micropost.content = " " }
+    it { should_not be_valid }
+  end#blank content
+
+  describe "with content that is too long" do
+    before { @micropost.content = "a" * 141 }
+    it { should_not be_valid }
+  end#content too long
+
 
 end

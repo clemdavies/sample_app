@@ -13,6 +13,7 @@ SampleApp::Application.routes.draw do
   resources :sessions, only: [:new, :create, :destroy]
 
   root to: 'static_pages#home'
+  #root to: this users bookmarks page, unless not signed in
 
   match '/signup',  to: 'users#new'
   match '/signin',  to: 'sessions#new'

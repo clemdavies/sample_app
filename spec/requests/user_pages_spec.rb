@@ -67,7 +67,7 @@ describe "UserPages" do
       it_should_behave_like "all invalid signups"
       describe "after submission" do
         before { click_button submit }
-        it { should have_error_message '1'}
+        it { should have_error_message "1"}
         it { should have_blank_name_error }
       end
     end#with no name

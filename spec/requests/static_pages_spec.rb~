@@ -14,6 +14,7 @@ describe "Static pages" do
     before { visit root_path }
     let(:heading)    { 'Sample App' }
     let(:page_title) { '' }
+
     it_should_behave_like "all static pages"
 
     describe "for signed-in users" do
@@ -21,15 +22,31 @@ describe "Static pages" do
       before do
         FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
         FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
-        sign_in user
+        valid_signin user
         visit root_path
       end
+
+
+      it "should render microposts counter" do
+        page.should have_selector("aside.span4 span",text: user.feed.count.to_s + " micropost" )
+
+        page.should have_selector("aside.span4 span",text: user.feed.count.to_s + " microposts" )
+      end#render microposts counter
+
+
 
       it "should render the user's feed" do
         user.feed.each do |item|
           page.should have_selector("li##{item.id}", text: item.content)
         end
-      end
+      end#render feed
+
+
+
+
+
+
+
     end#signed-in users
 
   end#home

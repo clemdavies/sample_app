@@ -45,4 +45,41 @@ describe "Micropost pages" do
 
   end#micropost destruction
 
+  describe "micropost pagination" do
+
+    before do
+      for i in 1..100
+        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum" + i.to_s)
+      end
+      visit root_path
+    end
+
+    it "should render 30 microposts" do
+      page.should have_selector("ol li", :count=>30)
+    end
+
+    it "should render correct links" do
+
+      page.should have_link("Previous", href:"#")
+      page.should have_selector("div.pagination li.previous_page.disabled",text:"Previous")
+
+
+      page.should have_link("Next", href:"/?page=2")
+      page.should have_selector("div.pagination li.next_page",text:"Next")
+
+
+      page.should have_link("1", href:"/?page=1")
+      page.should have_selector("div.pagination li a",text:"1")
+
+      page.should have_link("2", href:"/?page=2")
+      page.should have_selector("div.pagination li a",text:"2")
+
+
+    end
+
+
+  end#micropost pagination
+
+
+
 end

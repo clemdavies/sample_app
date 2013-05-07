@@ -82,7 +82,17 @@ describe "AuthenticationPages" do
           it { should have_selector('title', text: 'Sign in') }
         end
 
-      end#users controller
+        describe "visiting the following page" do
+          before { visit following_user_path(user) }
+          it { should have_selector('title', text: 'Sign in') }
+        end
+
+        describe "visiting the followers page" do
+          before { visit followers_user_path(user) }
+          it { should have_selector('title', text: 'Sign in') }
+        end
+
+      end#Users controller
 
       describe "in the Microposts controller" do
 
@@ -95,7 +105,19 @@ describe "AuthenticationPages" do
           before { delete micropost_path(FactoryGirl.create(:micropost)) }
           specify { response.should redirect_to(signin_path) }
         end
-      end#microposts controller
+      end#Microposts controller
+
+      describe "in the Relationships controller" do
+        describe "submitting to the create action" do
+          before { post relationships_path }
+          specify { response.should redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+          before { delete relationship_path(1) }
+          specify { response.should redirect_to(signin_path) }
+        end
+      end#Relationships controller
 
 
       describe "when attempting to visit a protected page" do
@@ -125,7 +147,6 @@ describe "AuthenticationPages" do
 
         end#after signing in
       end#attempt visit protected
-
     end#non-signed-in
 
     describe "for signed in users" do
@@ -205,5 +226,32 @@ describe "AuthenticationPages" do
   end#authorization
 
 
+  describe "following/followers" do
+    let(:user) { FactoryGirl.create(:user) }
+    let(:other_user) { FactoryGirl.create(:user) }
+    before { user.follow!(other_user) }
 
+    describe "followed users" do
+      before do
+        valid_signin user
+        visit following_user_path(user)
+      end
+
+      it { should have_selector('title', text: full_title('Following')) }
+      it { should have_selector('h3', text: 'Following') }
+      it { should have_link(other_user.name, href: user_path(other_user)) }
+    end#followed
+
+    describe "followers" do
+      before do
+        valid_signin other_user
+        visit followers_user_path(other_user)
+      end
+
+      it { should have_selector('title', text: full_title('Followers')) }
+      it { should have_selector('h3', text: 'Followers') }
+      it { should have_link(user.name, href: user_path(user)) }
+    end#followers
+
+  end#following/followers
 end

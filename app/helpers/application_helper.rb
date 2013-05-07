@@ -9,4 +9,5 @@ module ApplicationHelper
       "#{base_title} | #{page_title}"                 # String interpolation
     end                                               # Using implicit return, function returns last evaluated statement.
   end
+
 end

@@ -87,6 +87,8 @@ describe "UserPages" do
 
     end#follow unfollow buttons
 
+
+
   end#profile
 
   describe "signup" do

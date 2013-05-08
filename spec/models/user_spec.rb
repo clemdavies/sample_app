@@ -30,8 +30,8 @@ describe User do
   it { should respond_to(:microposts) }
   it { should respond_to(:feed) }
   it { should respond_to(:relationships) }
-  it { should respond_to(:followed_users) }
   it { should respond_to(:reverse_relationships) }
+  it { should respond_to(:followed_users) }
   it { should respond_to(:followers) }
   it { should respond_to(:following?) }
   it { should respond_to(:follow!) }
@@ -222,6 +222,27 @@ describe User do
       it { should_not be_following(other_user) }
       its(:followed_users) { should_not include(other_user) }
     end#unfollowing
+
+    it "should destroy associated followed_users" do
+      followed_users = @user.followed_users.dup
+      @user.destroy
+      followed_users.should_not be_empty
+      followed_users.each do |followed_user|
+        Relationship.find_by_id(followed_user.id).should be_nil
+      end
+    end#destroy user destroys followed_users
+
+
+    it "should destroy associated followers" do
+      followers = other_user.followers.dup
+      @user.destroy
+      followers.should_not be_empty
+      followers.each do |follower|
+        Relationship.find_by_id(follower.id).should be_nil
+      end
+    end#destroy user destroys followers
+
+
 
   end#following
 
